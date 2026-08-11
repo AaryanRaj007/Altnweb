@@ -1,0 +1,120 @@
+---
+// import Header from "../components/Header.astro";
+import Footer from "../components/Footer.astro";
+import TabNavbar from "../components/ui/tab-navbar";
+import SaySoWordmark from "../components/logo/SaySoWordmark";
+import "../styles/global.css";
+
+export interface Props {
+    title?: string;
+    description?: string;
+    showHero?: boolean;
+    heroTitle?: string;
+    heroSubtitle?: string;
+    ogImage?: string;
+    ogType?: string;
+    twitterCard?: string;
+    author?: string;
+    canonicalUrl?: string;
+}
+
+const {
+    title = "SaySo - Speak into any text field",
+    description = "SaySo is a free, unlimited, open source speech-to-text app that works completely offline.",
+    showHero = false,
+    heroTitle,
+    heroSubtitle,
+    ogImage = "/og-banner.png",
+    ogType = "website",
+    twitterCard = "summary_large_image",
+    author = "altn",
+    canonicalUrl,
+} = Astro.props;
+
+const fullTitle = title === "SaySo" ? title : `${title}`;
+const siteUrl = Astro.site || new URL(Astro.request.url).origin;
+const currentUrl = canonicalUrl || new URL(Astro.request.url).href;
+const fullOgImage = new URL(ogImage, siteUrl).href;
+
+const pathname = new URL(Astro.request.url).pathname;
+const currentPath = pathname.slice(1);
+---
+
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <meta name="description" content={description} />
+        <meta name="viewport" content="width=device-width" />
+        <meta name="author" content={author} />
+        <link rel="icon" type="image/png" href="/favicon.png" />
+        <link rel="apple-touch-icon" href="/icon.png" />
+        <link rel="canonical" href={currentUrl} />
+        <meta name="generator" content={Astro.generator} />
+
+        <!-- Brand fonts: Bagel Fat One (wordmark + large headings), Fredoka (everything else) -->
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+        <link
+            rel="stylesheet"
+            href="https://fonts.googleapis.com/css2?family=Bagel+Fat+One&family=Fredoka:wght@300..600&display=swap"
+        />
+
+        <!-- Primary Meta Tags -->
+        <title>{fullTitle}</title>
+        <meta name="title" content={fullTitle} />
+        <meta name="description" content={description} />
+
+        <!-- Open Graph / Facebook -->
+        <meta property="og:type" content={ogType} />
+        <meta property="og:url" content={currentUrl} />
+        <meta property="og:title" content={fullTitle} />
+        <meta property="og:description" content={description} />
+        <meta property="og:image" content={fullOgImage} />
+        <meta property="og:site_name" content="SaySo" />
+
+        <!-- Twitter -->
+        <meta property="twitter:card" content={twitterCard} />
+        <meta property="twitter:url" content={currentUrl} />
+        <meta property="twitter:title" content={fullTitle} />
+        <meta property="twitter:description" content={description} />
+        <meta property="twitter:image" content={fullOgImage} />
+
+        <!-- Additional Meta Tags -->
+        <meta name="robots" content="index, follow" />
+        <meta name="language" content="English" />
+    </head>
+    <body
+        class="flex flex-col max-w-[680px] mx-auto items-center gap-8 sm:gap-12 px-4 min-h-dvh"
+    >
+        <a
+            href="#main-content"
+            class="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 bg-sayso-yellow text-sayso-deep px-4 py-2 rounded"
+        >
+            Skip to main content
+        </a>
+        <TabNavbar currentPath={currentPath} client:load />
+
+        {
+            showHero && (
+                <section role="banner" aria-labelledby="hero-title">
+                    <div class="flex flex-col items-center text-center gap-2">
+                        <SaySoWordmark className="text-[4rem] sm:text-[6rem]" />
+                        <div class="flex flex-col gap-1 sm:gap-[10px]">
+                            <h1 id="hero-title">{heroTitle}</h1>
+                            {heroSubtitle && (
+                                <h3 class="text-sayso-text/70">
+                                    {heroSubtitle}
+                                </h3>
+                            )}
+                        </div>
+                    </div>
+                </section>
+            )
+        }
+
+        <main id="main-content" role="main" class="w-full flex-grow">
+            <slot />
+        </main>
+        <Footer />
+    </body>
+</html>

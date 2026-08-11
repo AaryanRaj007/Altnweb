@@ -1,0 +1,65 @@
+---
+import MainLayout from "../layouts/MainLayout.astro";
+import PlatformDownloadButton from "../components/PlatformDownloadButton";
+import Separator from "../components/Separator.astro";
+---
+
+<style>
+    p {
+        margin-bottom: 0;
+    }
+</style>
+
+<MainLayout
+    title="SaySo"
+    description="SaySo is a free, unlimited, open source speech-to-text app that works completely offline."
+    showHero={true}
+    heroTitle="speak into any text field"
+    heroSubtitle="the free and open source app for speech to text"
+>
+    <div class="flex flex-col items-center gap-12">
+        <div class="flex flex-col sm:flex-row gap-2 sm:gap-4 items-center">
+            <PlatformDownloadButton client:load />
+            <a href="/download">other platforms</a>
+        </div>
+
+        {/*
+          The upstream site had a demo video here. It was CJ's own screen
+          recording and narration, so it could not carry over to SaySo.
+          Drop a SaySo recording into public/ and restore a <video> block here
+          when one exists.
+        */}
+
+        <Separator />
+        <div class="w-full grid grid-cols-1 md:grid-cols-2 md:gap-12 gap-4">
+            <div class="space-y-1">
+                <h2>Free</h2>
+                <p>
+                    Accessibility tooling belongs in everyone's hands, not
+                    behind a paywall.
+                </p>
+            </div>
+            <div class="space-y-1">
+                <h2>Open Source</h2>
+                <p>
+                    Together we can build further. Extend SaySo for yourself and
+                    contribute to something bigger.
+                </p>
+            </div>
+            <div class="space-y-1">
+                <h2>Private</h2>
+                <p>
+                    Your voice stays on your computer. Get transcriptions
+                    without sending audio to the cloud.
+                </p>
+            </div>
+            <div class="space-y-1">
+                <h2>Simple</h2>
+                <p>
+                    One tool, one job. Transcribe what you say and put it into a
+                    text box.
+                </p>
+            </div>
+        </div>
+    </div>
+</MainLayout>

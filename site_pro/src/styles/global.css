@@ -1,0 +1,112 @@
+@import "tailwindcss";
+@import url('https://fonts.googleapis.com/css2?family=Bagel+Fat+One&display=swap');
+
+@theme {
+    /* Pro Cinematic Black Palette */
+    --color-sayso-background: #000000;
+    --color-sayso-text: #ffffff;
+    
+    /* We repurposed yellow to a hyper-bright white/silver for accenting */
+    --color-sayso-yellow: #ffffff; 
+    --color-sayso-yellow-dim: #a1a1aa; 
+
+    /* Typography */
+    --font-display: 'Bagel Fat One', system-ui, cursive;
+    --font-sans: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+}
+
+@layer base {
+    body {
+        background-color: var(--color-sayso-background);
+        color: var(--color-sayso-text);
+        font-family: var(--font-sans);
+        letter-spacing: -0.015em;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+    }
+
+    h1, h2, h3, h4, h5, h6 {
+        font-family: var(--font-display);
+        letter-spacing: 0.02em;
+        font-weight: normal;
+        line-height: 1.1;
+    }
+
+    h1 {
+        font-size: clamp(3rem, 8vw, 7rem);
+    }
+
+    h2 {
+        font-size: clamp(1.5rem, 4vw, 3rem);
+    }
+}
+
+@layer utilities {
+    .animate-fade-in-up {
+        animation: fadeInUp 1s cubic-bezier(0.16, 1, 0.3, 1) both;
+    }
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* LUT card grid */
+.lut-card {
+    position: relative;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    background: rgba(255, 255, 255, 0.02);
+    border-radius: 1.5rem;
+    padding: 1.5rem;
+    transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+    backdrop-filter: blur(20px);
+    overflow: hidden;
+}
+
+/* Glassmorphism shine edge */
+.lut-card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    padding: 1px;
+    background: linear-gradient(to bottom right, rgba(255,255,255,0.2), rgba(255,255,255,0) 50%);
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    pointer-events: none;
+}
+
+.lut-card:hover {
+    background: rgba(255, 255, 255, 0.04);
+    transform: translateY(-4px) scale(1.02);
+    border-color: rgba(255, 255, 255, 0.2);
+    box-shadow: 0 20px 40px rgba(0,0,0,0.8), 0 0 40px rgba(255,255,255,0.03);
+}
+
+.category-header {
+    font-family: var(--font-display);
+    font-size: clamp(2rem, 5vw, 4rem);
+    font-weight: 700;
+    letter-spacing: -0.05em;
+    margin-bottom: 2.5rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+    color: #ffffff;
+}
+
+/* Glass utilities */
+.glass {
+    background: rgba(0,0,0,0.6);
+    backdrop-filter: blur(24px) saturate(180%);
+    border: 1px solid rgba(255,255,255,0.1);
+}
+
+

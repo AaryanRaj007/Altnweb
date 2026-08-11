@@ -1,0 +1,169 @@
+---
+title: "Troubleshooting"
+description: "Common issues, platform-specific notes, and solutions organized by symptom."
+order: 10
+---
+
+## Debug Mode
+
+Enable debug mode to see detailed logs. See the Debug page for how to enable it and where to find log files.
+
+## Common Issues
+
+### SaySo is not transcribing anything
+
+- Check that your microphone is not muted at the system level
+- Make sure a model has been downloaded (check **Settings > Models**)
+- Try switching to a different microphone in **Settings > General**
+- Enable debug mode and check the logs for errors
+
+### Shortcuts stopped working on macOS (Secure Input)
+
+macOS has a system mechanism called **Secure Input** which protects things like password fields. While it's active macOS stops delivering some key events
+to SaySo. If your shortcuts include a regular key (like Option+Space) suddenly stop triggering, while modifier-only shortcuts (like just `fn`) still work, it's probably due to Secure Input. Recent versions of SaySo detect this, show a warning banner in settings (naming the process when possible), and automatically switch affected shortcuts to a fallback so they keep working.
+
+Common causes and fixes:
+
+1. **Terminal or iTerm2**: disable "Secure Keyboard Entry" in the Terminal (or iTerm2) application menu
+2. **Password managers**: quit or update them; some 1Password and KeePassXC releases are known to hold Secure Input while in the background
+3. **A stuck `loginwindow` or an app that quit while holding it**: press <kbd>Ctrl</kbd>+<kbd>Cmd</kbd>+<kbd>Q</kbd> to lock the screen, then log back in **by typing your password** (not Touch ID). If that fails, log out and back in fully
+
+To see which process is holding Secure Input yourself, run:
+
+```bash
+ioreg -l -w 0 | grep -o 'kCGSSessionSecureInputPID"=[0-9]*' | grep -o '[0-9]*' | head -1 | xargs ps -o pid,comm -p
+```
+
+Note that macOS reports this on a best-effort basis. The named process may not be the real culprit, and it can come up empty if the holder already quit. SaySo's debug window (<kbd>Cmd</kbd>+<kbd>Shift</kbd>+<kbd>D</kbd>) also has a **Keyboard Diagnostic** that checks whether key events are reaching SaySo at all.
+
+SaySo only shows the warning banner when one of your shortcuts is actually affected. A few limitations while Secure Input is active:
+
+- Shortcuts using the `fn` key with a regular key (e.g. `fn`+`End`) cannot be covered by the fallback and will not work until Secure Input is resolved. SaySo lists them in the warning banner
+- Shortcuts with a side-specific modifier (e.g. Right Option+Space) temporarily respond to **either** side while the fallback is active, and the banner calls this out
+- Modifier-only shortcuts (just `fn`, just Left Ctrl, etc.) are unaffected and always keep working, so they make a good push-to-talk choice if you hit this often
+- Recording new shortcuts is disabled until Secure Input is resolved, since SaySo cannot see the keys you press
+
+### Text is not being pasted
+
+- Make sure your cursor is in a text field before starting transcription
+- Try switching the paste method in **Settings > Advanced** (see [Paste Methods](/docs/paste-methods))
+- On macOS, ensure SaySo has Accessibility permissions (**System Settings > Privacy & Security > Accessibility**)
+- On Linux, check your typing tool configuration (see [Paste Methods > Typing Tools](/docs/paste-methods#typing-tools-linux))
+- On Windows, try running SaySo as administrator along with switching **Keyboard Implementation** to **Tauri Global Shortcut** in [Advanced > Experimental](/docs/advanced#experimental-features)
+- Try increasing the paste delay in Debug settings
+
+### Wrong text is being pasted
+
+If SaySo pastes your previous clipboard contents instead of the transcription, increase the paste delay in Debug settings. The default is 60ms; try 100-200ms.
+
+### Slow transcription
+
+- Try a smaller model (Moonshine Tiny or Whisper Small)
+- Check that GPU acceleration is being used (visible in debug logs)
+- Close other GPU-intensive applications
+- Configure the model unload timeout in [Advanced](/docs/advanced#unload-model) settings
+
+### Microphone not detected
+
+- Check system audio settings to ensure the mic is recognized
+- Try unplugging and reconnecting the microphone
+- Use the refresh button next to the microphone dropdown in **Settings > General**
+- On Linux, check that PulseAudio or PipeWire is running
+
+### Whisper crashes
+
+Whisper models can crash on certain hardware configurations, particularly older CPUs and some Windows/Linux systems. If Whisper crashes:
+
+1. **Use Parakeet V3 instead** - it is the most stable model and recommended for English
+2. Try a smaller Whisper model (Small instead of Medium or Large)
+3. Update your GPU drivers (Vulkan support is required)
+4. Run with `--debug` to capture crash details for bug reports
+
+### vulkan-1.dll not found (Windows)
+
+Update your GPU drivers (NVIDIA, AMD, or Intel). Vulkan is required for GPU acceleration. If your GPU is too old to support Vulkan, SaySo may not work on your system.
+
+- **NVIDIA**: Download from [nvidia.com/drivers](https://www.nvidia.com/drivers)
+- **AMD**: Download from [amd.com/en/support](https://www.amd.com/en/support)
+- **Intel**: Download from [intel.com/content/www/us/en/download-center](https://www.intel.com/content/www/us/en/download-center/home.html)
+
+### Garbled text with non-QWERTY keyboards
+
+If SaySo outputs garbled text when you use AZERTY, QWERTZ, or other non-US keyboard layouts, you are likely using the Direct Input paste method. Switch to a clipboard-based paste method. See [Paste Methods](/docs/paste-methods#garbled-text-with-non-qwerty-keyboards) for details.
+
+### Blank window on Linux
+
+On some Linux systems, SaySo may show a blank window due to a WebKit DMA-BUF rendering issue. Recent versions of SaySo set `WEBKIT_DISABLE_DMABUF_RENDERER=1` automatically. If you are on an older version, set this environment variable manually:
+
+```bash
+WEBKIT_DISABLE_DMABUF_RENDERER=1 sayso
+```
+
+### AppImage GLIBC error (Linux)
+
+The AppImage requires GLIBC 2.38+. Ubuntu 22.04 ships with GLIBC 2.35 and is incompatible. Solutions:
+- Use the `.deb` package instead of the AppImage
+- Upgrade to Ubuntu 24.04+ or another distribution with GLIBC 2.38+
+
+### Overlay steals focus on Linux
+
+On some Linux desktop environments, the SaySo overlay takes focus away from the target window, preventing paste. Set **Overlay Position** to **None** in **Settings > Advanced**. See [Advanced > Overlay Position](/docs/advanced#overlay-position).
+
+### Wayland overlay not showing
+
+The Wayland overlay requires `gtk-layer-shell` as a runtime dependency:
+
+- **Debian/Ubuntu**: `sudo apt install libgtk-layer-shell0`
+- **Arch**: `sudo pacman -S gtk-layer-shell`
+- **Fedora**: `sudo dnf install gtk4-layer-shell`
+
+Note: On KDE Wayland, gtk-layer-shell initialization is skipped to prevent overlay issues.
+
+### Failed model download
+
+If a model download fails partway through and you cannot re-download it:
+
+1. Go to **About > App Data Directory**
+2. Navigate to the `models/` folder
+3. Delete any partially downloaded files
+4. Restart SaySo and try the download again
+
+## Platform-Specific Notes
+
+### macOS
+
+- SaySo requires **Accessibility** and **Microphone** permissions
+- If SaySo cannot paste, re-add it in **System Settings > Privacy & Security > Accessibility**
+- Metal GPU acceleration is used automatically
+- Install via Homebrew: `brew install --cask sayso`
+
+### Windows
+
+- Run the installer as administrator if you encounter permission issues
+- Vulkan drivers are required for GPU acceleration
+- Make sure your audio drivers are up to date
+- If SaySo cannot paste into apps running as administrator, run SaySo as administrator too. 
+- Try switching **Keyboard Implementation** to **Tauri Global Shortcut** in [Advanced > Experimental](/docs/advanced#experimental-features) if you continue to encounter pasting issues.
+- For pasting into terminals (CMD, PowerShell), use the Shift+Insert paste method
+
+### Linux
+
+- AppImage requires FUSE (`sudo apt install libfuse2` on Ubuntu/Debian)
+- Wayland users should configure a [typing tool](/docs/paste-methods#typing-tools-linux) for paste to work
+- X11 generally works out of the box
+- Vulkan drivers are needed for GPU acceleration (`vulkan-tools` to verify)
+- Control SaySo from scripts/WMs using signals or CLI flags
+- Set overlay to None if it steals focus from the target window
+
+## Known Issues
+
+- **Whisper instability on certain hardware** - Whisper models may crash on older CPUs or specific GPU configurations. Use Parakeet V3 as a stable alternative.
+- **Linux audio playback in history** - Audio playback of recorded history entries may not work on some Linux configurations.
+
+## Getting Help
+
+If you are still stuck:
+
+- Join the [Discord](https://discord.gg/WVBeWsNXK4) and ask in the support channel
+- Open an issue on [GitHub](https://github.com/AaryanRaj007/SaySo) for app bugs
+- Open an issue on the [docs repo](https://github.com/AaryanRaj007/SaySo) for documentation issues

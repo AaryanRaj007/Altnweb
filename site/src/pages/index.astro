@@ -1,0 +1,90 @@
+---
+import MainLayout from "../layouts/MainLayout.astro";
+import Separator from "../components/Separator.astro";
+---
+
+<style>
+    p {
+        margin-bottom: 0;
+    }
+</style>
+
+<MainLayout
+    title="altn"
+    description="23 self-authored color grading LUTs for trekking and drone footage. 65-point precision, DaVinci Resolve native."
+    showHero={true}
+    heroTitle="color, owned."
+    heroSubtitle="23 LUTs for real footage - trekking, cinematic, drone"
+>
+    <div class="flex flex-col items-center gap-12">
+        <div class="flex flex-col sm:flex-row gap-2 sm:gap-4 items-center">
+            <a
+                href="/luts"
+                class="px-6 py-3 rounded-xl bg-sayso-yellow text-[#0a0a0a] hover:bg-sayso-yellow-dim font-bold !no-underline transition-colors"
+            >
+                browse the pack
+            </a>
+            <a href="/about">why these exist</a>
+        </div>
+
+        <Separator />
+        <div class="w-full grid grid-cols-1 md:grid-cols-2 md:gap-12 gap-4">
+            <div class="space-y-1">
+                <h2>Self-authored</h2>
+                <p>
+                    Every LUT built from scratch on real footage. No third-party
+                    licensing risk, no repacked presets.
+                </p>
+            </div>
+            <div class="space-y-1">
+                <h2>Two sources, one set</h2>
+                <p>
+                    Apple Log and DJI D-Log footage both work. Utility layer
+                    normalizes to Rec.709 first, creative LUTs sit on top.
+                </p>
+            </div>
+            <div class="space-y-1">
+                <h2>65-point precision</h2>
+                <p>
+                    Every LUT is 65-point - no banding in sky gradients, no
+                    stepping in smooth transitions. The reason drone footage
+                    needs more than DJI's 33-point default.
+                </p>
+            </div>
+            <div class="space-y-1">
+                <h2>DaVinci native</h2>
+                <p>
+                    Standard .cube format. Drop into Resolve, Premiere, FCP, or
+                    any editor that reads 3D LUTs. No plugins, no subscriptions.
+                </p>
+            </div>
+        </div>
+
+        <Separator />
+        <div class="w-full">
+            <h2 class="text-center mb-8">the set</h2>
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                <a href="/luts#natural" class="lut-card !no-underline group">
+                    <div class="text-sayso-yellow font-bold text-lg">Natural</div>
+                    <div class="text-sayso-text/50 text-sm">5 LUTs</div>
+                    <div class="text-sayso-text/40 text-xs mt-1">baselines, warm, cool, protection, punch</div>
+                </a>
+                <a href="/luts#cinematic" class="lut-card !no-underline group">
+                    <div class="text-sayso-yellow font-bold text-lg">Cinematic</div>
+                    <div class="text-sayso-text/50 text-sm">8 LUTs</div>
+                    <div class="text-sayso-text/40 text-xs mt-1">teal-orange, film, golden/blue hour, vintage</div>
+                </a>
+                <a href="/luts#mood" class="lut-card !no-underline group">
+                    <div class="text-sayso-yellow font-bold text-lg">Mood</div>
+                    <div class="text-sayso-text/50 text-sm">5 LUTs</div>
+                    <div class="text-sayso-text/40 text-xs mt-1">brand, night, vintage, vlog, documentary</div>
+                </a>
+                <a href="/luts#drone" class="lut-card !no-underline group">
+                    <div class="text-sayso-yellow font-bold text-lg">Drone</div>
+                    <div class="text-sayso-text/50 text-sm">5 LUTs</div>
+                    <div class="text-sayso-text/40 text-xs mt-1">haze, sky, terrain, water, sunset</div>
+                </a>
+            </div>
+        </div>
+    </div>
+</MainLayout>

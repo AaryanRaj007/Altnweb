@@ -1,0 +1,212 @@
+---
+import MainLayout from "../layouts/MainLayout.astro";
+import { GITHUB_OWNER, GITHUB_URL } from "../config/site";
+import { VERSION, VERSION_TAG, DOWNLOAD_LINKS } from "../config/downloads";
+
+const brewInstallCommand = `/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"`;
+const brewCommand = `brew install --cask --no-quarantine ${GITHUB_OWNER}/sayso/sayso`;
+const cloneCommand = `git clone ${GITHUB_URL}.git\ncd SaySo\nbun install\nbun run tauri build`;
+
+const methods = [
+    {
+        id: "homebrew",
+        n: "1",
+        title: "Homebrew",
+        tag: "recommended",
+        blurb: "One command. No security warning, nothing to click through.",
+    },
+    {
+        id: "direct",
+        n: "2",
+        title: "Direct download",
+        tag: null,
+        blurb: "Grab the .dmg and drag it across. One extra step the first time.",
+    },
+    {
+        id: "source",
+        n: "3",
+        title: "Build from source",
+        tag: null,
+        blurb: "Clone the repo and build it yourself.",
+    },
+];
+---
+
+<MainLayout
+    title="Download SaySo"
+    description="Install SaySo, the free and open source speech to text application."
+>
+    <div class="flex flex-col gap-10 w-full">
+        <div class="flex flex-col items-center gap-1 text-center">
+            <h1 class="!mb-1">Install SaySo</h1>
+            <div class="text-sayso-text/60 font-semibold">
+                {VERSION_TAG} · macOS (Apple Silicon)
+            </div>
+            <p class="text-sm text-sayso-text/50 !mt-1 !mb-0">
+                On Windows? A build is <a href="#windows">coming soon</a>.
+            </p>
+        </div>
+
+        {/* Method picker */}
+        <div class="grid gap-3 sm:grid-cols-3">
+            {
+                methods.map((m) => (
+                    <a
+                        href={`#${m.id}`}
+                        class="flex flex-col gap-1 rounded-xl border border-sayso-text/10 bg-sayso-text/[0.02] p-4 !no-underline hover:border-sayso-yellow hover:bg-sayso-yellow/10 transition-colors"
+                    >
+                        <div class="flex items-center gap-2">
+                            <span class="font-bold">{m.title}</span>
+                            {m.tag && (
+                                <span class="text-[10px] uppercase tracking-wider font-bold bg-sayso-yellow text-sayso-deep px-1.5 py-0.5 rounded">
+                                    {m.tag}
+                                </span>
+                            )}
+                        </div>
+                        <p class="!m-0 text-sm text-sayso-text/60 leading-snug">
+                            {m.blurb}
+                        </p>
+                    </a>
+                ))
+            }
+        </div>
+
+        {/* 1. Homebrew */}
+        <section id="homebrew" class="scroll-mt-8">
+            <h2 class="!mb-1">1. Homebrew</h2>
+            <p class="text-sayso-text/60 !mt-0">
+                The smoothest option. macOS never shows a warning, because
+                Homebrew doesn't tag the app as downloaded from the internet.
+            </p>
+
+            <h3 class="!text-lg !mt-6 !mb-1">
+                Step 1: Install Homebrew (skip if you have it)
+            </h3>
+            <p class="!mt-0 text-sm">
+                Not sure? Run <code>brew --version</code> in Terminal. If it
+                prints a version number you already have it, so go to step 2.
+                Otherwise paste this into Terminal:
+            </p>
+            <pre class="astro-code"><code>{brewInstallCommand}</code></pre>
+            <p class="text-sm text-sayso-text/60">
+                It will ask for your Mac password and take a few minutes. When it
+                finishes it may print two <code>export PATH</code> lines. Run
+                those, or just close and reopen Terminal, so the{" "}
+                <code>brew</code> command is found.
+            </p>
+
+            <h3 class="!text-lg !mt-6 !mb-1">Step 2: Install SaySo</h3>
+            <pre class="astro-code"><code>{brewCommand}</code></pre>
+            <p class="text-sm text-sayso-text/60">
+                The <code>--no-quarantine</code> flag is what skips the security
+                prompt. Without it you'll get the same warning as the direct download
+                below.
+            </p>
+        </section>
+
+        {/* 2. Direct download */}
+        <section id="direct" class="scroll-mt-8">
+            <h2 class="!mb-1">2. Direct download</h2>
+            <p class="text-sayso-text/60 !mt-0">
+                Download the disk image, open it, and drag SaySo into your
+                Applications folder.
+            </p>
+
+            <a
+                href={DOWNLOAD_LINKS.mac}
+                class="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-sayso-yellow !text-sayso-deep hover:bg-sayso-light-yellow font-bold !no-underline transition-colors my-2"
+            >
+                Download SaySo {VERSION} (.dmg)
+            </a>
+
+            <h3 class="!text-lg !mt-6 !mb-1">
+                If macOS says it can't check the app
+            </h3>
+            <p class="!mt-0">
+                You'll see <em
+                    >"Apple could not verify SaySo is free of malware."</em
+                > That's expected. SaySo isn't notarized by Apple, which costs
+                $99/year. The app is unaffected. To get past it, once:
+            </p>
+            <ol class="text-sm">
+                <li>Open <b>System Settings → Privacy &amp; Security</b></li>
+                <li>Scroll to the bottom, where you'll see SaySo was blocked</li>
+                <li>Click <b>Open Anyway</b>, then open SaySo again</li>
+            </ol>
+            <p class="text-sm text-sayso-text/60">
+                You only do this once. Right-click → Open no longer works on
+                recent macOS versions, so use the steps above.
+            </p>
+        </section>
+
+        {/* 3. Build from source */}
+        <section id="source" class="scroll-mt-8">
+            <h2 class="!mb-1">3. Build from source</h2>
+            <p class="text-sayso-text/60 !mt-0">
+                You'll need <a href="https://rustup.rs" target="_blank">Rust</a>
+                and <a href="https://bun.sh" target="_blank">Bun</a>.
+            </p>
+            <pre class="astro-code"><code>{cloneCommand}</code></pre>
+            <p class="text-sm text-sayso-text/60">
+                The built app lands in <code
+                    >src-tauri/target/release/bundle/macos/</code
+                >.
+            </p>
+        </section>
+
+        {/* Permissions */}
+        <section>
+            <h2 class="!mb-1">After installing</h2>
+            <p class="!mt-0">
+                SaySo asks for two macOS permissions on first launch. Both are
+                required, so grant them and you're done:
+            </p>
+            <ul class="text-sm">
+                <li>
+                    <b>Microphone</b>: to hear you. Audio never leaves your
+                    machine.
+                </li>
+                <li>
+                    <b>Accessibility</b>: to type the transcription into
+                    whatever app you're using.
+                </li>
+            </ul>
+            <p class="text-sm text-sayso-text/60">
+                Then press <b>Option + Space</b>, speak, and release.
+            </p>
+        </section>
+
+        {/* Windows */}
+        <section id="windows" class="scroll-mt-8">
+            <h2 class="!mb-1">Windows</h2>
+            <div
+                class="rounded-xl border border-sayso-text/10 bg-sayso-yellow/10 p-4 my-2"
+            >
+                <div class="font-bold !mb-1">Coming soon</div>
+                <p class="!m-0 text-sm text-sayso-text/70">
+                    SaySo runs on Windows, but there's no installer to download
+                    yet. It's built and tested on macOS first, and the Windows
+                    build has to run on a Windows machine, so it follows shortly.
+                </p>
+            </div>
+            <p class="text-sm text-sayso-text/60">
+                In the meantime you can <a href="#source">build from source</a> on
+                Windows. When the installer does land, SmartScreen will warn that
+                the publisher is unknown, for the same reason macOS does: the app
+                isn't signed with a paid certificate. Click <b>More info</b>, then
+                <b>Run anyway</b>.
+            </p>
+        </section>
+
+        <section>
+            <h3 class="!text-lg !mb-1">Other platforms</h3>
+            <p class="text-sm text-sayso-text/60 !mt-0">
+                SaySo ships for macOS on Apple Silicon and Windows on x64. Intel
+                Macs and Linux aren't supported by the prebuilt downloads, but
+                the code still builds on them, so <a href="#source"
+                    >build from source</a
+                > if you're on one.
+            </p>
+        </section>
+    </div>
+</MainLayout>

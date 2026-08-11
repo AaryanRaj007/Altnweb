@@ -1,0 +1,70 @@
+---
+import MainLayout from "../layouts/MainLayout.astro";
+import LutGallery from "../components/ui/LutGallery";
+
+const categories = [
+    {
+        id: "natural",
+        title: "Natural",
+        luts: [
+            { name: "Altn_natural1", title: "Neutral baseline", desc: "Near-identity verification LUT. Safe default." },
+            { name: "Altn_natural2", title: "Warm neutral", desc: "Gentle warm grade, shadow warmth, subtle S-curve." },
+            { name: "Altn_natural3", title: "Cool neutral", desc: "Gentle cool grade, blue shadow lift." },
+            { name: "Altn_natural4", title: "Shadow/highlight protection", desc: "Minimal compression for further grading downstream." },
+            { name: "Altn_natural5", title: "Flat punch-up", desc: "Pure contrast/gamma correction, no color shift." },
+        ],
+    },
+    {
+        id: "cinematic",
+        title: "Cinematic",
+        luts: [
+            { name: "Altn_cinematic1", title: "Teal-orange restrained", desc: "Restrained split tone, low saturation push." },
+            { name: "Altn_cinematic2", title: "Moody desaturated", desc: "Dark mood, heavy desaturation, slight cool cast." },
+            { name: "Altn_cinematic3", title: "Film contrast", desc: "Faded film: lifted blacks, rolled highlights, warm-desat." },
+            { name: "Altn_cinematic4", title: "Himalayan cold blue", desc: "Cold blue mountain aesthetic." },
+            { name: "Altn_cinematic5", title: "Golden hour", desc: "Golden hour amplifier, warm gold mids/highlights." },
+            { name: "Altn_cinematic6", title: "Golden hour bold", desc: "Committed golden hour. Heavy amber, high saturation." },
+            { name: "Altn_cinematic7", title: "Blue hour bold", desc: "Rich cinematic blue hour, saturated blues." },
+            { name: "Altn_cinematic8", title: "Vintage film bold", desc: "Rich film stock, cross-process hints." },
+        ],
+    },
+    {
+        id: "mood",
+        title: "Mood",
+        luts: [
+            { name: "Altn_mood1", title: "Brand contrast", desc: "High-contrast, warm-coded." },
+            { name: "Altn_mood2", title: "Night blue hour", desc: "Dark blue mood, desaturated, shadow detail." },
+            { name: "Altn_mood3", title: "Muted vintage", desc: "Faded, low contrast, warm sepia." },
+            { name: "Altn_mood4", title: "Punchy vlog", desc: "Vivid, contrasty, slightly warm." },
+            { name: "Altn_mood5", title: "Desaturated documentary", desc: "Neutral, very low saturation, good contrast." },
+        ],
+    },
+    {
+        id: "drone",
+        title: "Drone",
+        luts: [
+            { name: "Altn_drone1", title: "Haze cut", desc: "Atmospheric haze correction, blue cut." },
+            { name: "Altn_drone2", title: "Sky punch", desc: "Blue sky saturation boost, highlight protection." },
+            { name: "Altn_drone3", title: "Terrain contrast", desc: "Ground texture pop, earth tone boost." },
+            { name: "Altn_drone4", title: "Water clarity", desc: "Cyan/teal water boost, midtone contrast." },
+            { name: "Altn_drone5", title: "Sunset aerial", desc: "Warm sunset sky, rich orange/amber." },
+        ],
+    },
+];
+---
+
+<MainLayout
+    title="LUTs"
+    description="Browse all 23 altn LUTs by category: Natural, Cinematic, Mood, and Drone."
+>
+    <div class="flex flex-col gap-12 w-full">
+        <div class="flex flex-col items-center gap-1 text-center">
+            <h1 class="!mb-1">the pack</h1>
+            <div class="text-sayso-text/50 font-medium">
+                23 creative LUTs · 65-point · .cube
+            </div>
+        </div>
+
+        <LutGallery client:load categories={categories} />
+    </div>
+</MainLayout>

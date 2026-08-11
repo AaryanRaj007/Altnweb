@@ -1,0 +1,126 @@
+---
+import MainLayout from "../layouts/MainLayout.astro";
+import BeforeAfterSlider from "../components/ui/BeforeAfterSlider";
+---
+
+<MainLayout
+    title="Utility LUTs"
+    description="How the altn utility layer works: Apple Log and D-Log to Rec.709 conversion LUTs."
+>
+    <div class="flex flex-col gap-10 w-full">
+        <div class="flex flex-col items-center gap-1 text-center">
+            <h1 class="!mb-1">utility layer</h1>
+            <div class="text-sayso-text/50 font-medium">
+                the conversion step before the creative grade
+            </div>
+        </div>
+
+        <section>
+            <h2 class="!mb-2">how it works</h2>
+            <p>
+                Your footage is shot in log - flat, desaturated, designed to
+                capture maximum dynamic range. Before any creative LUT can
+                work, that log signal needs to be converted to a standard
+                color space (Rec.709).
+            </p>
+            <p>
+                That's what the utility LUTs do. They sit as the first node in
+                your DaVinci Resolve node tree, converting your camera's log
+                format to Rec.709. Every creative LUT in the pack assumes
+                Rec.709 input - this is what keeps the set at 23 files instead
+                of 46.
+            </p>
+
+            <div class="rounded-xl border border-sayso-text/10 bg-sayso-yellow/5 p-5 my-6 font-mono text-sm text-center">
+                <span class="text-sayso-text/40">[Log footage]</span>
+                <span class="text-sayso-yellow mx-3">&rarr;</span>
+                <span class="text-sayso-yellow font-bold">Utility LUT</span>
+                <span class="text-sayso-yellow mx-3">&rarr;</span>
+                <span class="text-sayso-text/40">[Rec.709]</span>
+                <span class="text-sayso-yellow mx-3">&rarr;</span>
+                <span class="text-sayso-text font-bold">Creative LUT</span>
+                <span class="text-sayso-yellow mx-3">&rarr;</span>
+                <span class="text-sayso-text/40">[Final]</span>
+            </div>
+        </section>
+
+        <section class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+            <div class="lut-card">
+                <div class="mb-4 w-full">
+                    <BeforeAfterSlider
+                        client:load
+                        beforeImage="/previews/log_base.jpg"
+                        afterImage="/previews/Altn_util1.jpg"
+                        beforeAlt="D-Log"
+                        afterAlt="Rec.709"
+                    />
+                </div>
+                <div class="text-sayso-yellow font-bold text-lg mb-2">Altn_util1</div>
+                <div class="text-sm text-sayso-text/50 mb-3">D-Log → Rec.709 · 33-point</div>
+                <p class="!m-0 text-sm text-sayso-text/70 leading-relaxed">
+                    For DJI drone footage (Phantom/X5/X7 family). Reused from
+                    DJI's official X7 DLOG2Rec709 conversion - the neutral one,
+                    not the stylized sRGB variant. 33-point grid matches DJI's
+                    own reference precision.
+                </p>
+                <a
+                    href="/luts/utility/Altn_util1.cube"
+                    download="Altn_util1.cube"
+                    class="inline-block mt-4 px-3 py-1.5 rounded-lg border border-sayso-yellow/20 text-sayso-yellow text-xs font-bold !no-underline hover:bg-sayso-yellow/10 transition-colors"
+                >
+                    download
+                </a>
+            </div>
+            <div class="lut-card">
+                <div class="mb-4 w-full">
+                    <BeforeAfterSlider
+                        client:load
+                        beforeImage="/previews/log_base.jpg"
+                        afterImage="/previews/Altn_util2.jpg"
+                        beforeAlt="Apple Log"
+                        afterAlt="Rec.709"
+                    />
+                </div>
+                <div class="text-sayso-yellow font-bold text-lg mb-2">Altn_util2</div>
+                <div class="text-sm text-sayso-text/50 mb-3">Apple Log → Rec.709 · 65-point</div>
+                <p class="!m-0 text-sm text-sayso-text/70 leading-relaxed">
+                    For iPhone ProRes 422 HQ footage shot in Apple Log. Built
+                    from Apple's published transfer function: Apple Log inverse
+                    OETF, BT.2020-to-BT.709 gamut matrix, Gamma 2.4 encode. No
+                    tone mapping, no gamut mapping - pure mathematical conversion.
+                </p>
+                <a
+                    href="/luts/utility/Altn_util2.cube"
+                    download="Altn_util2.cube"
+                    class="inline-block mt-4 px-3 py-1.5 rounded-lg border border-sayso-yellow/20 text-sayso-yellow text-xs font-bold !no-underline hover:bg-sayso-yellow/10 transition-colors"
+                >
+                    download
+                </a>
+            </div>
+        </section>
+
+        <section>
+            <h2 class="!mb-2">DaVinci Resolve setup</h2>
+            <ol class="text-sm space-y-2">
+                <li>
+                    <strong>Node 1 - Utility:</strong> right-click your clip in
+                    the Media Pool, open Clip Attributes, and set the Input LUT
+                    to <code>Altn_util1.cube</code> (D-Log) or
+                    <code>Altn_util2.cube</code> (Apple Log). Alternatively, add
+                    a Corrector node and apply the LUT there.
+                </li>
+                <li>
+                    <strong>Node 2 - Creative:</strong> add a second Corrector
+                    node after the utility node. Apply any creative LUT from the
+                    pack here. This node receives Rec.709 input.
+                </li>
+                <li>
+                    <strong>Never bake them together.</strong> Keep utility and
+                    creative as separate nodes. This lets you swap creative LUTs
+                    without touching the conversion, and swap cameras without
+                    touching the grade.
+                </li>
+            </ol>
+        </section>
+    </div>
+</MainLayout>
