@@ -1,0 +1,185 @@
+---
+interface DocEntry {
+    id: string;
+    title: string;
+    alpha?: boolean;
+}
+
+interface Heading {
+    depth: number;
+    slug: string;
+    text: string;
+}
+
+interface Props {
+    docs: DocEntry[];
+    currentId: string;
+    headings: Heading[];
+}
+
+const { docs, currentId, headings } = Astro.props;
+const tocHeadings = headings.filter((h) => h.depth === 2 || h.depth === 3);
+---
+
+<aside
+    class="docs-sidebar hidden sm:block w-48 shrink-0 mt-3"
+    aria-label="Documentation navigation"
+>
+    <!-- max-h + overflow-y let the sidebar scroll independently. Without it a
+         sidebar taller than the viewport gets stuck and its last few entries
+         are unreachable. -->
+    <nav
+        data-docs-nav
+        class="sticky top-8 max-h-[calc(100dvh-4rem)] overflow-y-auto pr-1"
+    >
+        <ul class="space-y-0.5 border-l-2 border-sayso-text/10">
+            {
+                docs.map((doc) => {
+                    const isActive = doc.id === currentId;
+                    return (
+                        <>
+                            <li>
+                                <a
+                                    href={
+                                        doc.id === "getting-started"
+                                            ? "/docs"
+                                            : `/docs/${doc.id}`
+                                    }
+                                    class={`block text-sm py-1 pl-3 -ml-[2px] border-l-2 ${
+                                        isActive
+                                            ? "nav-active border-sayso-yellow font-semibold"
+                                            : "!font-normal text-sayso-text/60 hover:text-sayso-gold border-transparent hover:border-sayso-yellow"
+                                    }`}
+                                    aria-current={isActive ? "page" : undefined}
+                                >
+                                    {doc.title}
+                                </a>
+                            </li>
+                            {isActive &&
+                                tocHeadings.length > 0 &&
+                                tocHeadings.map((heading) => (
+                                    <li>
+                                        <a
+                                            href={`#${heading.slug}`}
+                                            data-heading-link={heading.slug}
+                                            class={`toc-link block text-xs py-0.5 -ml-[2px] border-l-2 border-transparent !font-normal text-sayso-text/40 hover:text-sayso-gold hover:border-sayso-yellow transition-colors ${
+                                                heading.depth === 3
+                                                    ? "pl-8"
+                                                    : "pl-6"
+                                            }`}
+                                        >
+                                            {heading.text.replace(/#$/, "").trim()}
+                                        </a>
+                                    </li>
+                                ))}
+                        </>
+                    );
+                })
+            }
+        </ul>
+    </nav>
+</aside>
+
+<style>
+    .docs-sidebar ul {
+        list-style: none;
+        padding-left: 0;
+        margin: 0;
+    }
+    /* Brand yellow alone is unreadable on the cream background, so highlighted
+       entries get the same treatment as the wordmark: yellow fill with a dark
+       outline drawn behind it. */
+    .nav-active,
+    .toc-link.active {
+        color: var(--sayso-yellow);
+        -webkit-text-stroke: 0.7px var(--sayso-text);
+        paint-order: stroke fill;
+    }
+
+    .toc-link.active {
+        border-left-color: var(--sayso-yellow);
+    }
+</style>
+
+<script>
+    function initScrollSpy() {
+        const links = document.querySelectorAll<HTMLAnchorElement>("[data-heading-link]");
+        if (!links.length) return;
+
+        const slugs = Array.from(links).map((l) => l.dataset.headingLink!);
+        const headings = slugs
+            .map((s) => document.getElementById(s))
+            .filter(Boolean) as HTMLElement[];
+
+        if (!headings.length) return;
+
+        const OFFSET = 100;
+
+        function update() {
+            let activeSlug = headings[0].id;
+
+            for (const h of headings) {
+                if (h.getBoundingClientRect().top < OFFSET) {
+                    activeSlug = h.id;
+                } else {
+                    break;
+                }
+            }
+
+            links.forEach((link) => {
+                link.classList.toggle("active", link.dataset.headingLink === activeSlug);
+            });
+        }
+
+        window.addEventListener("scroll", update, { passive: true });
+        update();
+    }
+
+    /**
+     * When the sidebar is taller than the viewport it becomes its own scroll
+     * container, which means scrolling the page leaves it parked at the top and
+     * the last few entries look unreachable. Drive its scroll from the page's
+     * scroll progress instead, so hitting the bottom of the page also lands the
+     * sidebar on its last entry. Manual scrolling inside the sidebar still
+     * works and temporarily takes over.
+     */
+    function initSidebarSync() {
+        const nav = document.querySelector<HTMLElement>("[data-docs-nav]");
+        if (!nav) return;
+
+        let manualUntil = 0;
+        const markManual = () => {
+            manualUntil = Date.now() + 1500;
+        };
+        nav.addEventListener("wheel", markManual, { passive: true });
+        nav.addEventListener("touchmove", markManual, { passive: true });
+
+        function sync() {
+            if (Date.now() < manualUntil) return;
+
+            const overflow = nav.scrollHeight - nav.clientHeight;
+            if (overflow <= 0) return; // fits, nothing to do
+
+            const pageScrollable =
+                document.documentElement.scrollHeight - window.innerHeight;
+            if (pageScrollable <= 0) return;
+
+            const progress = Math.min(
+                1,
+                Math.max(0, window.scrollY / pageScrollable),
+            );
+            nav.scrollTop = overflow * progress;
+        }
+
+        window.addEventListener("scroll", sync, { passive: true });
+        window.addEventListener("resize", sync);
+        sync();
+    }
+
+    initScrollSpy();
+    initSidebarSync();
+    document.addEventListener("astro:page-load", () => {
+        initScrollSpy();
+        initSidebarSync();
+    });
+</script>

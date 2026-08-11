@@ -1,0 +1,90 @@
+---
+import Footer from "../components/Footer.astro";
+import TabNavbar from "../components/ui/tab-navbar";
+import AltnWordmark from "../components/logo/AltnWordmark";
+import "../styles/global.css";
+
+export interface Props {
+    title?: string;
+    description?: string;
+    showHero?: boolean;
+    heroTitle?: string;
+    heroSubtitle?: string;
+}
+
+const {
+    title = "altn LUTs",
+    description = "23 self-authored color grading LUTs for trekking and drone footage. 65-point, DaVinci Resolve native.",
+    showHero = false,
+    heroTitle,
+    heroSubtitle,
+} = Astro.props;
+
+const fullTitle = title === "altn LUTs" ? title : `${title} - altn LUTs`;
+const currentUrl = new URL(Astro.request.url).href;
+const pathname = new URL(Astro.request.url).pathname;
+const currentPath = pathname.slice(1);
+---
+
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <meta name="description" content={description} />
+        <meta name="viewport" content="width=device-width" />
+        <meta name="author" content="altn" />
+        <link rel="icon" type="image/png" href="/favicon.png" />
+        <link rel="canonical" href={currentUrl} />
+
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+        <link
+            href="https://fonts.googleapis.com/css2?family=Bagel+Fat+One&family=Fredoka:wght@300..700&display=swap"
+            rel="stylesheet"
+        />
+
+        <title>{fullTitle}</title>
+        <meta name="title" content={fullTitle} />
+
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content={currentUrl} />
+        <meta property="og:title" content={fullTitle} />
+        <meta property="og:description" content={description} />
+        <meta property="og:site_name" content="altn LUTs" />
+
+        <meta name="robots" content="index, follow" />
+    </head>
+    <body
+        class="flex flex-col max-w-[720px] mx-auto items-center gap-8 sm:gap-12 px-4 min-h-dvh"
+    >
+        <a
+            href="#main-content"
+            class="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 bg-sayso-yellow text-sayso-text px-4 py-2 rounded"
+        >
+            Skip to main content
+        </a>
+        <TabNavbar currentPath={currentPath} client:load />
+
+        {
+            showHero && (
+                <section role="banner" aria-labelledby="hero-title">
+                    <div class="flex flex-col items-center text-center gap-2 mt-4 sm:mt-10">
+                        <AltnWordmark className="text-[4rem] sm:text-[6rem]" />
+                        <div class="flex flex-col gap-1 sm:gap-[10px]">
+                            <h1 id="hero-title">{heroTitle}</h1>
+                            {heroSubtitle && (
+                                <h3 class="text-sayso-text/60">
+                                    {heroSubtitle}
+                                </h3>
+                            )}
+                        </div>
+                    </div>
+                </section>
+            )
+        }
+
+        <main id="main-content" role="main" class="w-full flex-grow mt-2 sm:mt-4">
+            <slot />
+        </main>
+        <Footer />
+    </body>
+</html>

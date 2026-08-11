@@ -1,0 +1,222 @@
+---
+title: "Models"
+description: "Choose the right speech-to-text model for your language, speed, and accuracy needs."
+order: 2
+---
+
+import LanguageList from "../../components/LanguageList.tsx";
+import DocImage from '../../components/DocImage.astro';
+
+## Overview
+
+SaySo supports multiple speech-to-text models. All models run locally on your machine. Nothing is sent to the cloud.
+
+<DocImage src="/docs/sayso-models.png" alt="SaySo Models Settings" />
+
+## Parakeet
+
+[NVIDIA's Parakeet](https://huggingface.co/nvidia/parakeet-tdt-0.6b-v3) models are optimized for western languages. **Parakeet V3 is the recommended model** for most users. It's fast, accurate, and supports 25 languages.
+
+Parakeet writes out numbers as words (e.g. "one", "two", "three") rather than digits. Language is detected automatically and cannot be manually specified.
+
+<LanguageList client:load title="Parakeet V3 Supported Languages" languages={["English", "Spanish", "French", "German", "Portuguese", "Russian", "Italian", "Polish", "Dutch", "Romanian", "Ukrainian", "Czech", "Greek", "Swedish", "Hungarian", "Bulgarian", "Danish", "Finnish", "Slovak", "Croatian", "Lithuanian", "Slovenian", "Latvian", "Estonian", "Maltese"]} />
+
+## Whisper
+
+[OpenAI's Whisper](https://huggingface.co/openai/whisper-large-v3) models support 99+ languages and optional translation to English. Best choice if you need broad multilingual support.
+
+Whisper outputs numbers as digits (e.g. "1", "2", "3") and allows you to specify which language to transcribe, or let it auto-detect. **Whisper Medium** is a great balance of speed and accuracy for users with capable hardware.
+
+<LanguageList client:load title="Whisper Supported Languages" languages={["English", "Chinese (Simplified)", "Chinese (Traditional)", "Spanish", "Hindi", "Arabic", "French", "Portuguese", "Bengali", "Russian", "Japanese", "Indonesian", "German", "Korean", "Turkish", "Vietnamese", "Italian", "Thai", "Urdu", "Polish", "Ukrainian", "Dutch", "Romanian", "Persian", "Malay", "Tamil", "Telugu", "Tagalog", "Swahili", "Czech", "Greek", "Hungarian", "Swedish", "Hebrew", "Norwegian", "Danish", "Finnish", "Marathi", "Gujarati", "Kannada", "Malayalam", "Punjabi", "Serbian", "Croatian", "Bulgarian", "Slovak", "Catalan", "Lithuanian", "Slovenian", "Latvian", "Estonian", "Nepali", "Sinhala", "Amharic", "Khmer", "Lao", "Myanmar", "Azerbaijani", "Uzbek", "Kazakh", "Georgian", "Armenian", "Albanian", "Bosnian", "Macedonian", "Cantonese", "Javanese", "Sundanese", "Hausa", "Yoruba", "Somali", "Mongolian", "Pashto", "Sindhi", "Assamese", "Afrikaans", "Malagasy", "Shona", "Lingala", "Galician", "Basque", "Welsh", "Icelandic", "Maltese", "Belarusian", "Turkmen", "Tajik", "Tatar", "Bashkir", "Tibetan", "Maori", "Luxembourgish", "Faroese", "Breton", "Occitan", "Haitian Creole", "Hawaiian", "Latin", "Sanskrit", "Yiddish"]} />
+
+### Breeze ASR
+
+A Whisper variant optimized for Taiwanese Mandarin with code-switching support (~1.1 GB).
+
+## Moonshine
+
+Moonshine models are lightweight and English-only. Great for quick transcription on lower-powered hardware.
+
+## GigaAM v3
+
+GigaAM v3 is a Russian speech recognition model. It supports punctuation, Latin characters, and digits. A good choice for Russian speakers who want fast, accurate local transcription.
+
+## Canary
+
+[NVIDIA's Canary](https://huggingface.co/nvidia/canary-1b) models support transcription and translation across European languages. They output proper punctuation, capitalization, and inverse text normalization (e.g. "one hundred twenty three" → "123"). The 1B v2 model supports ITN; the Flash model does not.
+
+Canary does not support automatic language detection. When language is set to "auto", it defaults to English. This means if you speak another language with "auto" selected, Canary will translate your speech into English rather than transcribing it in the original language. You should manually select your language for best results.
+
+<LanguageList client:load title="Canary 180M Flash Supported Languages" languages={["English", "German", "Spanish", "French"]} />
+
+<LanguageList client:load title="Canary 1B v2 Supported Languages" languages={["English", "Spanish", "French", "German", "Portuguese", "Russian", "Italian", "Polish", "Dutch", "Romanian", "Ukrainian", "Czech", "Greek", "Swedish", "Hungarian", "Bulgarian", "Danish", "Finnish", "Slovak", "Croatian", "Lithuanian", "Slovenian", "Latvian", "Estonian", "Maltese"]} />
+
+## SenseVoice
+
+SenseVoice is a fast model from FunAudioLLM supporting a small set of East Asian languages plus English.
+
+<LanguageList client:load title="SenseVoice Supported Languages" languages={["Chinese", "English", "Japanese", "Korean", "Cantonese"]} />
+
+## All available models
+
+SaySo ships a catalog of **67 models** across 13 families. All of them run entirely on your machine. Sizes are the default download for each model; several also offer smaller quantised builds in the app.
+
+Models marked ⭐ are the ones SaySo recommends by default.
+
+### Parakeet
+
+| Model | Params | Languages | Size | Capabilities |
+|---|---|---|---|---|
+| ⭐ Parakeet Unified EN 0.6B | 0.6B | English only | 697 MB | streaming |
+| Multitalker Parakeet Streaming EN | 0.6B | English only | 700 MB | streaming |
+| Parakeet CTC 0.6B | 0.6B | English only | 689 MB | None |
+| Parakeet CTC 1.1B | 1.1B | English only | 886 MB | None |
+| Parakeet RNN-T 0.6B | 0.6B | English only | 696 MB | None |
+| Parakeet RNN-T 1.1B | 1.1B | English only | 892 MB | None |
+| Parakeet TDT 0.6B v2 | 0.6B | English only | 696 MB | None |
+| Parakeet TDT 0.6B v3 | 0.6B | 25 languages | 705 MB | auto-detect |
+| Parakeet TDT 1.1B | 1.1B | English only | 892 MB | None |
+| Parakeet TDT-CTC 1.1B | 1.1B | English only | 892 MB | None |
+| Parakeet TDT-CTC 110M | 110M | English only | 129 MB | None |
+
+### Nemotron
+
+| Model | Params | Languages | Size | Capabilities |
+|---|---|---|---|---|
+| ⭐ Nemotron Streaming 3.5 | 0.6B | 28 languages | 716 MB | streaming, auto-detect |
+| Nemotron Speech Streaming EN | 0.6B | English only | 696 MB | streaming |
+
+### Canary
+
+| Model | Params | Languages | Size | Capabilities |
+|---|---|---|---|---|
+| ⭐ Canary 180M Flash | 180M | 4 languages | 208 MB | translate |
+| Canary 1B | 1B | 4 languages | 799 MB | translate |
+| Canary 1B Flash | 1B | 4 languages | 734 MB | translate |
+| Canary 1B v2 | 1B | 25 languages | 798 MB | translate |
+| Canary-Qwen 2.5B | 2.5B | English only | 1.8 GB | None |
+
+### Cohere
+
+| Model | Params | Languages | Size | Capabilities |
+|---|---|---|---|---|
+| ⭐ Cohere Transcribe | 2.0B | 14 languages | 1.6 GB | None |
+| Cohere Transcribe | 2.0B | 2 languages | 1.6 GB | None |
+
+### Whisper
+
+| Model | Params | Languages | Size | Capabilities |
+|---|---|---|---|---|
+| ⭐ Whisper Medium | 764M | 99 languages | 793 MB | translate, auto-detect |
+| Breeze-ASR-25 | 1.5B | 2 languages | 1.1 GB | translate, auto-detect |
+| Whisper Base | 73M | 99 languages | 81 MB | translate, auto-detect |
+| Whisper Base (English) | 73M | English only | 81 MB | None |
+| Whisper Large | 1.5B | 99 languages | 1.1 GB | translate, auto-detect |
+| Whisper Large v2 | 1.5B | 99 languages | 1.1 GB | translate, auto-detect |
+| Whisper Large v3 | 1.5B | 100 languages | 1.1 GB | translate, auto-detect |
+| Whisper Large v3 Turbo | 809M | 100 languages | 845 MB | auto-detect |
+| Whisper Medium (English) | 764M | English only | 793 MB | None |
+| Whisper Small | 242M | 99 languages | 257 MB | translate, auto-detect |
+| Whisper Small (English) | 242M | English only | 257 MB | None |
+| Whisper Tiny | 38M | 99 languages | 44 MB | translate, auto-detect |
+| Whisper Tiny (English) | 38M | English only | 44 MB | None |
+
+### Voxtral
+
+| Model | Params | Languages | Size | Capabilities |
+|---|---|---|---|---|
+| Voxtral Mini 3B | 4.7B | 8 languages | 3.2 GB | translate, auto-detect |
+| Voxtral Mini 4B Realtime | 4.8B | 13 languages | 3.1 GB | streaming, auto-detect |
+| Voxtral Small 24B | 24.3B | 8 languages | 16.0 GB | translate, auto-detect |
+
+### Qwen3-ASR
+
+| Model | Params | Languages | Size | Capabilities |
+|---|---|---|---|---|
+| Qwen3-ASR 0.6B | 782M | 30 languages | 811 MB | auto-detect |
+| Qwen3-ASR 1.7B | 2.0B | 30 languages | 1.4 GB | auto-detect |
+
+### Fun-ASR
+
+| Model | Params | Languages | Size | Capabilities |
+|---|---|---|---|---|
+| Fun-ASR Nano | 985M | 3 languages | 850 MB | None |
+| Fun-ASR Nano Multilingual | 985M | 31 languages | 850 MB | None |
+
+### GigaAM
+
+| Model | Params | Languages | Size | Capabilities |
+|---|---|---|---|---|
+| GigaAM v3 CTC | 221M | ru | 259 MB | None |
+| GigaAM v3 E2E-CTC | 221M | ru | 260 MB | None |
+| GigaAM v3 E2E-RNN-T | 223M | ru | 261 MB | None |
+| GigaAM v3 RNN-T | 222M | ru | 260 MB | None |
+
+### Granite Speech
+
+| Model | Params | Languages | Size | Capabilities |
+|---|---|---|---|---|
+| Granite Speech 4.0 1B | 2.3B | 6 languages | 1.7 GB | translate |
+| Granite Speech 4.1 2B | 2.3B | 6 languages | 1.7 GB | translate |
+| Granite Speech 4.1 2B NAR | 2.3B | 5 languages | 1.7 GB | None |
+| Granite Speech 4.1 2B Plus | 2.1B | 5 languages | 1.6 GB | None |
+
+### MedASR
+
+| Model | Params | Languages | Size | Capabilities |
+|---|---|---|---|---|
+| MedASR | 105M | English only | 122 MB | None |
+
+### Moonshine
+
+| Model | Params | Languages | Size | Capabilities |
+|---|---|---|---|---|
+| Moonshine Base | 62M | English only | 74 MB | None |
+| Moonshine Base (Arabic) | 62M | ar | 74 MB | None |
+| Moonshine Base (Chinese) | 62M | zh | 74 MB | None |
+| Moonshine Base (Japanese) | 62M | ja | 74 MB | None |
+| Moonshine Base (Korean) | 62M | ko | 74 MB | None |
+| Moonshine Base (Ukrainian) | 62M | uk | 74 MB | None |
+| Moonshine Base (Vietnamese) | 62M | vi | 74 MB | None |
+| Moonshine Streaming Medium | 266M | English only | 282 MB | streaming |
+| Moonshine Streaming Small | 140M | English only | 189 MB | streaming |
+| Moonshine Streaming Tiny | 44M | English only | 48 MB | streaming |
+| Moonshine Tiny | 27M | English only | 34 MB | None |
+| Moonshine Tiny (Arabic) | 27M | ar | 34 MB | None |
+| Moonshine Tiny (Chinese) | 27M | zh | 34 MB | None |
+| Moonshine Tiny (Japanese) | 27M | ja | 34 MB | None |
+| Moonshine Tiny (Korean) | 27M | ko | 34 MB | None |
+| Moonshine Tiny (Ukrainian) | 27M | uk | 34 MB | None |
+| Moonshine Tiny (Vietnamese) | 27M | vi | 34 MB | None |
+
+### SenseVoice
+
+| Model | Params | Languages | Size | Capabilities |
+|---|---|---|---|---|
+| SenseVoice Small | 234M | 5 languages | 241 MB | auto-detect |
+
+
+## Changing Your Model
+
+Open SaySo's settings and select a model from the dropdown. New models will be downloaded on first use.
+
+## Speed vs. Accuracy
+
+- **Fastest transcription**: Moonshine or SenseVoice for English/supported languages
+- **Best all-rounder**: Parakeet V3 for European languages
+- **Best for translation**: Canary 1B v2 for European language translation
+- **Best for Russian**: GigaAM v3
+- **Best multilingual**: Whisper Small or Medium
+- **Best accuracy**: Whisper Large
+
+## Custom Models
+
+As an experimental feature, you can load custom Whisper-compatible models. Place a `.bin` model file in the `models/` directory inside your SaySo app data folder (check **About** for the path). SaySo will discover it on the next launch.
+
+## Hardware Considerations
+
+**Whisper models** use GPU acceleration automatically:
+- **macOS**: Metal
+- **Windows/Linux**: Vulkan
+
+**All other models** (Parakeet, Canary, Moonshine, SenseVoice, GigaAM) currently run on CPU only. GPU acceleration support is coming soon.
