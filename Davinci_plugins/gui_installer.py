@@ -2,6 +2,7 @@ import sys
 import os
 import shutil
 import platform
+import subprocess
 from PySide6.QtWidgets import (
     QApplication, QMainWindow, QWidget, QVBoxLayout,
     QLabel, QPushButton, QMessageBox
@@ -80,50 +81,39 @@ class InstallerWindow(QMainWindow):
         home = os.path.expanduser("~")
 
         if system == "Darwin":
-            target_dirs = [
-                os.path.join(home, "Library/Application Support/Blackmagic Design/DaVinci Resolve/Fusion/Scripts/Edit"),
-                os.path.join(home, "Library/Application Support/Blackmagic Design/DaVinci Resolve/Fusion/Scripts/Comp"),
-                os.path.join(home, "Library/Application Support/Blackmagic Design/DaVinci Resolve/Fusion/Scripts/Utility")
-            ]
+            edit_dir = os.path.join(home, "Library/Application Support/Blackmagic Design/DaVinci Resolve/Fusion/Scripts/Edit")
+            app_dir = os.path.join(home, "Library/Application Support/altn_plugins/YouTubeDownloader")
         elif system == "Windows":
             appdata = os.environ.get("APPDATA", os.path.join(home, "AppData", "Roaming"))
             programdata = os.environ.get("PROGRAMDATA", "C:\\ProgramData")
-            target_dirs = [
-                os.path.join(appdata, "Blackmagic Design", "DaVinci Resolve", "Support", "Fusion", "Scripts", "Edit"),
-                os.path.join(appdata, "Blackmagic Design", "DaVinci Resolve", "Support", "Fusion", "Scripts", "Comp"),
-                os.path.join(appdata, "Blackmagic Design", "DaVinci Resolve", "Support", "Fusion", "Scripts", "Utility"),
-                os.path.join(programdata, "Blackmagic Design", "DaVinci Resolve", "Fusion", "Scripts", "Edit"),
-                os.path.join(programdata, "Blackmagic Design", "DaVinci Resolve", "Fusion", "Scripts", "Utility")
+            edit_dir = os.path.join(appdata, "Blackmagic Design", "DaVinci Resolve", "Support", "Fusion", "Scripts", "Edit")
+            app_dir = os.path.join(appdata, "altn_plugins", "YouTubeDownloader")
+            
+            # Clean up duplicate launchers in ProgramData or other directories to prevent duplicates
+            extra_cleanups = [
+                os.path.join(programdata, "Blackmagic Design", "DaVinci Resolve", "Fusion", "Scripts", "Edit", "Altn_YouTube_LiveBrowser.py"),
+                os.path.join(appdata, "Blackmagic Design", "DaVinci Resolve", "Support", "Fusion", "Scripts", "Comp", "Altn_YouTube_LiveBrowser.py"),
+                os.path.join(appdata, "Blackmagic Design", "DaVinci Resolve", "Support", "Fusion", "Scripts", "Utility", "Altn_YouTube_LiveBrowser.py")
             ]
+            for old_file in extra_cleanups:
+                if os.path.exists(old_file):
+                    try:
+                        os.remove(old_file)
+                    except Exception:
+                        pass
         else:
             QMessageBox.critical(self, "Error", f"Unsupported Operating System: {system}")
             return
 
-        base_dir = getattr(sys, '_MEIPASS', os.path.dirname(os.path.abspath(__file__)))
-        source_plugin = os.path.join(base_dir, "YouTubeDownloader")
-
-        if not os.path.exists(source_plugin):
-            source_plugin = os.path.abspath(os.path.join(os.path.dirname(__file__), "YouTubeDownloader"))
-
-        if not os.path.exists(source_plugin):
-            QMessageBox.critical(self, "Error", f"Plugin source files not found at:\n{source_plugin}")
-            return
+        current_exe = os.path.abspath(sys.executable).replace("\\", "/")
 
         try:
-            # Detect cross-platform python executable dynamically
-            if system == "Windows":
-                python_exe = sys.executable.replace("\\", "/")
-            else:
-                python_exe = sys.executable
-
-            pyside_main = os.path.join(source_plugin, "main.py").replace("\\", "/")
-
-            for t_dir in target_dirs:
-                os.makedirs(t_dir, exist_ok=True)
-                launcher = os.path.join(t_dir, "Altn_YouTube_LiveBrowser.py")
-                with open(launcher, "w") as f:
-                    f.write(f"""import os, subprocess
-cmd = [r"{python_exe}", r"{pyside_main}"]
+            os.makedirs(edit_dir, exist_ok=True)
+            launcher = os.path.join(edit_dir, "Altn_YouTube_LiveBrowser.py")
+            
+            with open(launcher, "w", encoding="utf-8") as f:
+                f.write(f"""import subprocess
+cmd = [r"{current_exe}", "--run-plugin"]
 subprocess.Popen(cmd)
 """)
 
@@ -140,10 +130,24 @@ subprocess.Popen(cmd)
             QMessageBox.critical(self, "Installation Error", f"Failed to install plugin launcher:\n{str(e)}")
 
 def main():
-    app = QApplication(sys.argv)
-    window = InstallerWindow()
-    window.show()
-    sys.exit(app.exec())
+    if "--run-plugin" in sys.argv:
+        # Import and run the actual live YouTube browser window
+        base_dir = getattr(sys, '_MEIPASS', os.path.dirname(os.path.abspath(__file__)))
+        source_plugin = os.path.join(base_dir, "YouTubeDownloader")
+        if not os.path.exists(source_plugin):
+            source_plugin = os.path.abspath(os.path.join(os.path.dirname(__file__), "YouTubeDownloader"))
+        
+        sys.path.insert(0, source_plugin)
+        from main import MainWindow
+        app = QApplication(sys.argv)
+        window = MainWindow()
+        window.show()
+        sys.exit(app.exec())
+    else:
+        app = QApplication(sys.argv)
+        window = InstallerWindow()
+        window.show()
+        sys.exit(app.exec())
 
 if __name__ == "__main__":
     main()
