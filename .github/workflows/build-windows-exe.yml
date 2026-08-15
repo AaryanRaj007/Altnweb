@@ -19,18 +19,33 @@ jobs:
         with:
           python-version: '3.11'
 
-      - name: Install Dependencies
+      - name: Install Inno Setup
+        run: |
+          choco install innosetup -y
+          echo "C:\Program Files (x86)\Inno Setup 6" >> $env:GITHUB_PATH
+
+      - name: Install Python Dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install PySide6 PySide6-Addons pyinstaller
+          pip install PySide6 PySide6-Addons pyinstaller yt-dlp
 
-      - name: Build Windows Executable with PyInstaller
+      - name: Download Standalone yt-dlp Windows Binary
+        run: |
+          curl -L https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp.exe -o Davinci_plugins/yt-dlp.exe
+
+      - name: Build Application Directory with PyInstaller
         run: |
           cd Davinci_plugins
-          pyinstaller --onefile --windowed --name=Altn_YouTube_Downloader_Installer --add-data="YouTubeDownloader;YouTubeDownloader" --hidden-import=PySide6.QtWebEngineWidgets --hidden-import=PySide6.QtWebEngineCore --hidden-import=PySide6.QtWebChannel gui_installer.py
+          pyinstaller --onedir --windowed --name=Altn_MediaDownloader --hidden-import=PySide6.QtWebEngineWidgets --hidden-import=PySide6.QtWebEngineCore --hidden-import=PySide6.QtWebChannel run_app.py
+          copy yt-dlp.exe dist\Altn_MediaDownloader\
 
-      - name: Upload Artifact
+      - name: Compile Inno Setup Installer Wizard
+        run: |
+          cd Davinci_plugins
+          & "C:\Program Files (x86)\Inno Setup 6\ISCC.exe" installer.iss
+
+      - name: Upload Installer Artifact
         uses: actions/upload-artifact@v4
         with:
           name: Altn_YouTube_Downloader_Installer_Windows
-          path: Davinci_plugins/dist/Altn_YouTube_Downloader_Installer.exe
+          path: Davinci_plugins/dist_setup/Altn_YouTube_Downloader_Installer.exe

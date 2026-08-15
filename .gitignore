@@ -1,0 +1,52 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+build/
+develop-eggs/
+dist/
+dist_setup/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Virtual environments
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# Binaries & Archives
+*.dmg
+*.exe
+*.zip
+*.pkg
+*.app
+webengine_exe/
+deepwipe_exe/
+renamed_exe/
+Davinci_plugins/dist/
+Davinci_plugins/build/
+Davinci_plugins/dist_setup/
+
+# Node / Astro
+node_modules/
+.astro/
+dist/
+
+# OS / IDE
+.DS_Store
+.vscode/
+.idea/
