@@ -2,7 +2,7 @@
   "name": "altn-luts-site",
   "type": "module",
   "version": "0.1.0",
-  "description": "altn LUT pack — 23 self-authored color grading LUTs for trekking and drone footage.",
+  "description": "altn LUT pack with 33 self-authored color grading LUTs for trekking and drone footage.",
   "scripts": {
     "dev": "astro dev",
     "build": "astro build",
