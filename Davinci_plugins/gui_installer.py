@@ -79,50 +79,40 @@ class InstallerWindow(QMainWindow):
     def run_installation(self):
         system = platform.system()
         home = os.path.expanduser("~")
-        old_script_names = ["Altn_YouTube_LiveBrowser.py", "Altn_YouTube_Downloader.py", "Altn_MediaDownloader.py"]
 
+        # Define all search paths where DaVinci Resolve scans scripts
         if system == "Darwin":
-            edit_dir = os.path.join(home, "Library/Application Support/Blackmagic Design/DaVinci Resolve/Fusion/Scripts/Edit")
-            mac_dirs = [
-                os.path.join(home, "Library/Application Support/Blackmagic Design/DaVinci Resolve/Fusion/Scripts/Edit"),
-                os.path.join(home, "Library/Application Support/Blackmagic Design/DaVinci Resolve/Fusion/Scripts/Comp"),
-                os.path.join(home, "Library/Application Support/Blackmagic Design/DaVinci Resolve/Fusion/Scripts/Utility")
+            base_script_dirs = [
+                os.path.join(home, "Library/Application Support/Blackmagic Design/DaVinci Resolve/Fusion/Scripts")
             ]
-            for d in mac_dirs:
-                for old in old_script_names:
-                    fp = os.path.join(d, old)
-                    if os.path.exists(fp):
-                        try:
-                            os.remove(fp)
-                        except Exception:
-                            pass
-
+            edit_dir = os.path.join(home, "Library/Application Support/Blackmagic Design/DaVinci Resolve/Fusion/Scripts/Edit")
         elif system == "Windows":
             appdata = os.environ.get("APPDATA", os.path.join(home, "AppData", "Roaming"))
             programdata = os.environ.get("PROGRAMDATA", "C:\\ProgramData")
-            edit_dir = os.path.join(appdata, "Blackmagic Design", "DaVinci Resolve", "Support", "Fusion", "Scripts", "Edit")
-            
-            # Deep cleanup of ALL old script files in ALL Windows DaVinci script folders
-            win_dirs = [
-                os.path.join(appdata, "Blackmagic Design", "DaVinci Resolve", "Support", "Fusion", "Scripts", "Edit"),
-                os.path.join(appdata, "Blackmagic Design", "DaVinci Resolve", "Support", "Fusion", "Scripts", "Comp"),
-                os.path.join(appdata, "Blackmagic Design", "DaVinci Resolve", "Support", "Fusion", "Scripts", "Utility"),
-                os.path.join(programdata, "Blackmagic Design", "DaVinci Resolve", "Fusion", "Scripts", "Edit"),
-                os.path.join(programdata, "Blackmagic Design", "DaVinci Resolve", "Fusion", "Scripts", "Comp"),
-                os.path.join(programdata, "Blackmagic Design", "DaVinci Resolve", "Fusion", "Scripts", "Utility"),
-                os.path.join(appdata, "Blackmagic Design", "DaVinci Resolve", "Support", "Developer", "Scripting", "Scripts", "Edit")
+            base_script_dirs = [
+                os.path.join(appdata, "Blackmagic Design", "DaVinci Resolve", "Support", "Fusion", "Scripts"),
+                os.path.join(programdata, "Blackmagic Design", "DaVinci Resolve", "Fusion", "Scripts"),
+                os.path.join(appdata, "Blackmagic Design", "DaVinci Resolve", "Support", "Developer", "Scripting", "Scripts")
             ]
-            for d in win_dirs:
-                for old in old_script_names:
-                    fp = os.path.join(d, old)
-                    if os.path.exists(fp):
-                        try:
-                            os.remove(fp)
-                        except Exception:
-                            pass
+            edit_dir = os.path.join(appdata, "Blackmagic Design", "DaVinci Resolve", "Support", "Fusion", "Scripts", "Edit")
         else:
             QMessageBox.critical(self, "Error", f"Unsupported Operating System: {system}")
             return
+
+        # Deep wipe ALL legacy scripts (Altn_*, YouTube_*, LiveBrowser_*) from all root & subfolders
+        subfolders = ["", "Edit", "Comp", "Utility", "Deliver", "Color", "Toolbox"]
+        for base_dir in base_script_dirs:
+            for sub in subfolders:
+                target_folder = os.path.join(base_dir, sub) if sub else base_dir
+                if os.path.exists(target_folder):
+                    try:
+                        for fname in os.listdir(target_folder):
+                            if fname.lower().startswith(("altn_", "youtube_")) or fname.lower().endswith(("_livebrowser.py", "_downloader.py")):
+                                full_p = os.path.join(target_folder, fname)
+                                if os.path.isfile(full_p):
+                                    os.remove(full_p)
+                    except Exception:
+                        pass
 
         current_exe = os.path.abspath(sys.executable).replace("\\", "/")
 
@@ -140,6 +130,7 @@ subprocess.Popen(cmd)
                 self,
                 "Installation Complete",
                 "Altn YouTube Media Importer plugin installed successfully.\n\n"
+                "All legacy scripts cleaned.\n"
                 "To open inside DaVinci Resolve:\n"
                 "Workspace -> Scripts -> Edit -> Altn_MediaDownloader"
             )
@@ -149,7 +140,8 @@ subprocess.Popen(cmd)
             QMessageBox.critical(self, "Installation Error", f"Failed to install plugin launcher:\n{str(e)}")
 
 def main():
-    if "--run-plugin" in sys.argv:
+    # Strict check for --run-plugin argument flag
+    if any(arg == "--run-plugin" for arg in sys.argv):
         base_dir = getattr(sys, '_MEIPASS', os.path.dirname(os.path.abspath(__file__)))
         source_plugin = os.path.join(base_dir, "YouTubeDownloader")
         if not os.path.exists(source_plugin):
