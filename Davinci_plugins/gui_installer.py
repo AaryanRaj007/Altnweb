@@ -41,7 +41,7 @@ class InstallerWindow(QMainWindow):
 
         desc = QLabel(
             "Installs the Live YouTube Importer plugin directly into DaVinci Resolve.\n"
-            "Open via Workspace -> Scripts -> Edit inside DaVinci Resolve."
+            "Open via Workspace -> Scripts -> Edit -> Altn_MediaDownloader inside DaVinci Resolve."
         )
         desc.setStyleSheet("color: #b0b0ba; font-size: 13px; line-height: 1.5;")
         desc.setAlignment(Qt.AlignmentFlag.AlignCenter)
@@ -79,28 +79,47 @@ class InstallerWindow(QMainWindow):
     def run_installation(self):
         system = platform.system()
         home = os.path.expanduser("~")
+        old_script_names = ["Altn_YouTube_LiveBrowser.py", "Altn_YouTube_Downloader.py", "Altn_MediaDownloader.py"]
 
         if system == "Darwin":
             edit_dir = os.path.join(home, "Library/Application Support/Blackmagic Design/DaVinci Resolve/Fusion/Scripts/Edit")
-            app_dir = os.path.join(home, "Library/Application Support/altn_plugins/YouTubeDownloader")
+            mac_dirs = [
+                os.path.join(home, "Library/Application Support/Blackmagic Design/DaVinci Resolve/Fusion/Scripts/Edit"),
+                os.path.join(home, "Library/Application Support/Blackmagic Design/DaVinci Resolve/Fusion/Scripts/Comp"),
+                os.path.join(home, "Library/Application Support/Blackmagic Design/DaVinci Resolve/Fusion/Scripts/Utility")
+            ]
+            for d in mac_dirs:
+                for old in old_script_names:
+                    fp = os.path.join(d, old)
+                    if os.path.exists(fp):
+                        try:
+                            os.remove(fp)
+                        except Exception:
+                            pass
+
         elif system == "Windows":
             appdata = os.environ.get("APPDATA", os.path.join(home, "AppData", "Roaming"))
             programdata = os.environ.get("PROGRAMDATA", "C:\\ProgramData")
             edit_dir = os.path.join(appdata, "Blackmagic Design", "DaVinci Resolve", "Support", "Fusion", "Scripts", "Edit")
-            app_dir = os.path.join(appdata, "altn_plugins", "YouTubeDownloader")
             
-            # Clean up duplicate launchers in ProgramData or other directories to prevent duplicates
-            extra_cleanups = [
-                os.path.join(programdata, "Blackmagic Design", "DaVinci Resolve", "Fusion", "Scripts", "Edit", "Altn_YouTube_LiveBrowser.py"),
-                os.path.join(appdata, "Blackmagic Design", "DaVinci Resolve", "Support", "Fusion", "Scripts", "Comp", "Altn_YouTube_LiveBrowser.py"),
-                os.path.join(appdata, "Blackmagic Design", "DaVinci Resolve", "Support", "Fusion", "Scripts", "Utility", "Altn_YouTube_LiveBrowser.py")
+            # Deep cleanup of ALL old script files in ALL Windows DaVinci script folders
+            win_dirs = [
+                os.path.join(appdata, "Blackmagic Design", "DaVinci Resolve", "Support", "Fusion", "Scripts", "Edit"),
+                os.path.join(appdata, "Blackmagic Design", "DaVinci Resolve", "Support", "Fusion", "Scripts", "Comp"),
+                os.path.join(appdata, "Blackmagic Design", "DaVinci Resolve", "Support", "Fusion", "Scripts", "Utility"),
+                os.path.join(programdata, "Blackmagic Design", "DaVinci Resolve", "Fusion", "Scripts", "Edit"),
+                os.path.join(programdata, "Blackmagic Design", "DaVinci Resolve", "Fusion", "Scripts", "Comp"),
+                os.path.join(programdata, "Blackmagic Design", "DaVinci Resolve", "Fusion", "Scripts", "Utility"),
+                os.path.join(appdata, "Blackmagic Design", "DaVinci Resolve", "Support", "Developer", "Scripting", "Scripts", "Edit")
             ]
-            for old_file in extra_cleanups:
-                if os.path.exists(old_file):
-                    try:
-                        os.remove(old_file)
-                    except Exception:
-                        pass
+            for d in win_dirs:
+                for old in old_script_names:
+                    fp = os.path.join(d, old)
+                    if os.path.exists(fp):
+                        try:
+                            os.remove(fp)
+                        except Exception:
+                            pass
         else:
             QMessageBox.critical(self, "Error", f"Unsupported Operating System: {system}")
             return
@@ -109,7 +128,7 @@ class InstallerWindow(QMainWindow):
 
         try:
             os.makedirs(edit_dir, exist_ok=True)
-            launcher = os.path.join(edit_dir, "Altn_YouTube_LiveBrowser.py")
+            launcher = os.path.join(edit_dir, "Altn_MediaDownloader.py")
             
             with open(launcher, "w", encoding="utf-8") as f:
                 f.write(f"""import subprocess
@@ -122,7 +141,7 @@ subprocess.Popen(cmd)
                 "Installation Complete",
                 "Altn YouTube Media Importer plugin installed successfully.\n\n"
                 "To open inside DaVinci Resolve:\n"
-                "Workspace -> Scripts -> Edit -> Altn_YouTube_LiveBrowser"
+                "Workspace -> Scripts -> Edit -> Altn_MediaDownloader"
             )
             self.close()
 
@@ -131,7 +150,6 @@ subprocess.Popen(cmd)
 
 def main():
     if "--run-plugin" in sys.argv:
-        # Import and run the actual live YouTube browser window
         base_dir = getattr(sys, '_MEIPASS', os.path.dirname(os.path.abspath(__file__)))
         source_plugin = os.path.join(base_dir, "YouTubeDownloader")
         if not os.path.exists(source_plugin):
