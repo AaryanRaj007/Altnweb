@@ -87,9 +87,13 @@ class InstallerWindow(QMainWindow):
             ]
         elif system == "Windows":
             appdata = os.environ.get("APPDATA", os.path.join(home, "AppData", "Roaming"))
+            programdata = os.environ.get("PROGRAMDATA", "C:\\ProgramData")
             target_dirs = [
-                os.path.join(appdata, "Blackmagic Design", "DaVinci Resolve", "Support", "Developer", "Scripting", "Scripts", "Edit"),
-                os.path.join(appdata, "Blackmagic Design", "DaVinci Resolve", "Support", "Developer", "Scripting", "Scripts", "Utility")
+                os.path.join(appdata, "Blackmagic Design", "DaVinci Resolve", "Support", "Fusion", "Scripts", "Edit"),
+                os.path.join(appdata, "Blackmagic Design", "DaVinci Resolve", "Support", "Fusion", "Scripts", "Comp"),
+                os.path.join(appdata, "Blackmagic Design", "DaVinci Resolve", "Support", "Fusion", "Scripts", "Utility"),
+                os.path.join(programdata, "Blackmagic Design", "DaVinci Resolve", "Fusion", "Scripts", "Edit"),
+                os.path.join(programdata, "Blackmagic Design", "DaVinci Resolve", "Fusion", "Scripts", "Utility")
             ]
         else:
             QMessageBox.critical(self, "Error", f"Unsupported Operating System: {system}")
@@ -106,15 +110,20 @@ class InstallerWindow(QMainWindow):
             return
 
         try:
-            venv_python = "/Users/ankitraj/Downloads/tryingsomthingdif/venv/bin/python3"
-            pyside_main = os.path.join(source_plugin, "main.py")
+            # Detect cross-platform python executable dynamically
+            if system == "Windows":
+                python_exe = sys.executable.replace("\\", "/")
+            else:
+                python_exe = sys.executable
+
+            pyside_main = os.path.join(source_plugin, "main.py").replace("\\", "/")
 
             for t_dir in target_dirs:
                 os.makedirs(t_dir, exist_ok=True)
                 launcher = os.path.join(t_dir, "Altn_YouTube_LiveBrowser.py")
                 with open(launcher, "w") as f:
                     f.write(f"""import os, subprocess
-cmd = ["{venv_python}", "{pyside_main}"]
+cmd = [r"{python_exe}", r"{pyside_main}"]
 subprocess.Popen(cmd)
 """)
 
