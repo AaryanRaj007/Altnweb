@@ -1,0 +1,3 @@
+([('Install_Altn_YouTube_Downloader',
+   '/Users/ankitraj/Downloads/tryingsomthingdif/Davinci_plugins/dist/Install_Altn_YouTube_Downloader',
+   'EXECUTABLE')],)

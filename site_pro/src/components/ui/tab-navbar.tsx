@@ -107,7 +107,7 @@ export default function TabNavbar({ currentPath = "" }: { currentPath?: string }
                           className="flex h-full w-full select-none flex-col justify-end rounded-lg bg-sayso-yellow/10 border border-sayso-yellow/20 p-4 !no-underline outline-none transition-colors hover:bg-sayso-yellow/15"
                         >
                           <div className="mb-1 text-lg font-bold text-sayso-yellow">
-                            23 LUTs
+                            33 LUTs
                           </div>
                           <p className="!m-0 text-sm leading-tight text-sayso-text/60">
                             Self-authored. No licensing risk.
@@ -126,6 +126,19 @@ export default function TabNavbar({ currentPath = "" }: { currentPath?: string }
                     ))}
                   </ul>
                 </NavigationMenuContent>
+              </NavigationMenuItem>
+
+              <NavigationMenuItem>
+                <NavigationMenuLink
+                  className={cn(
+                    navigationMenuTriggerStyle(),
+                    "!no-underline",
+                    isActive("plugins") && "text-sayso-yellow",
+                  )}
+                  href="/plugins"
+                >
+                  plugins
+                </NavigationMenuLink>
               </NavigationMenuItem>
 
               <NavigationMenuItem>
@@ -197,6 +210,12 @@ export default function TabNavbar({ currentPath = "" }: { currentPath?: string }
               {item.title}
             </a>
           ))}
+          <a
+            href="/plugins"
+            className="block px-3 py-2 rounded-lg font-bold !no-underline hover:bg-sayso-yellow/10"
+          >
+            plugins
+          </a>
           <a
             href="/utility"
             className="block px-3 py-2 rounded-lg font-bold !no-underline hover:bg-sayso-yellow/10"

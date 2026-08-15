@@ -11,11 +11,10 @@ import Separator from "../components/Separator.astro";
 
 <MainLayout
     title="altn"
-    description="23 self-authored color grading LUTs for trekking and drone footage. 65-point precision, DaVinci Resolve native."
+    description="33 self-authored color grading LUTs for trekking and drone footage. 65-point precision, DaVinci Resolve native."
 >
     <!-- Centered Hero Section -->
     <section class="w-full flex flex-col items-center justify-center text-center mt-16 sm:mt-32 mb-24 sm:mb-40 animate-fade-in-up">
-        
         <h1 class="text-5xl sm:text-7xl leading-tight text-white mb-8 text-balance max-w-4xl">
             your footage, your grade,<br />your problem.
         </h1>
@@ -37,7 +36,6 @@ import Separator from "../components/Separator.astro";
     </section>
 
     <div class="flex flex-col items-center gap-12 w-full">
-
         <Separator />
         <div class="w-full grid grid-cols-1 md:grid-cols-2 md:gap-12 gap-4">
             <div class="space-y-1">
@@ -87,7 +85,7 @@ import Separator from "../components/Separator.astro";
                 </a>
                 <a href="/luts#mood" class="lut-card !no-underline group">
                     <div class="text-sayso-yellow font-bold text-lg">Mood</div>
-                    <div class="text-sayso-text/50 text-sm">5 LUTs</div>
+                    <div class="text-sayso-text/50 text-sm">15 LUTs</div>
                     <div class="text-sayso-text/40 text-xs mt-1">brand, night, vintage, vlog, documentary</div>
                 </a>
                 <a href="/luts#drone" class="lut-card !no-underline group">
@@ -96,6 +94,27 @@ import Separator from "../components/Separator.astro";
                     <div class="text-sayso-text/40 text-xs mt-1">haze, sky, terrain, water, sunset</div>
                 </a>
             </div>
+        </div>
+
+        <Separator />
+
+        <!-- Plugins Teaser Spotlight -->
+        <div class="w-full rounded-2xl border border-sayso-text/10 bg-sayso-yellow/5 p-6 sm:p-8 flex flex-col sm:flex-row items-center justify-between gap-6">
+            <div class="space-y-1 text-center sm:text-left">
+                <div class="inline-flex items-center gap-2 px-2.5 py-0.5 rounded-full bg-sayso-yellow/15 text-sayso-yellow text-xs font-bold w-fit mb-1">
+                    NEW WORKFLOW TOOL
+                </div>
+                <h2 class="!m-0 text-2xl sm:text-3xl">YouTube Media Importer</h2>
+                <p class="text-sayso-text/60 text-sm max-w-xl !m-0">
+                    Live YouTube browsing overlay right inside DaVinci Resolve. Download video & audio and import directly to Media Pool.
+                </p>
+            </div>
+            <a
+                href="/plugins"
+                class="px-6 py-3 rounded-xl bg-white text-black hover:bg-gray-200 font-bold text-sm shrink-0 !no-underline transition-all hover:scale-[1.02] active:scale-95"
+            >
+                explore plugin &rarr;
+            </a>
         </div>
     </div>
 </MainLayout>
