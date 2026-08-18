@@ -35,6 +35,8 @@ Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{
 Source: "dist\Altn_MediaDownloader\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
 ; DaVinci Resolve Launcher Script
 Source: "Altn_MediaDownloader.py"; DestDir: "{userappdata}\Blackmagic Design\DaVinci Resolve\Support\Fusion\Scripts\Edit"; Flags: ignoreversion
+; Fusion Effect Templates (Edit page → Effects panel → altn)
+Source: "Effects\*.setting"; DestDir: "{userappdata}\Blackmagic Design\DaVinci Resolve\Support\Fusion\Templates\Edit\Effects\altn"; Flags: ignoreversion
 
 [InstallDelete]
 ; Deep wipe legacy and duplicate script files from all Resolve directories
@@ -56,3 +58,4 @@ Filename: "{app}\{#MyAppExeName}"; Description: "{cm:LaunchProgram,{#StringChang
 
 [UninstallDelete]
 Type: files; Name: "{userappdata}\Blackmagic Design\DaVinci Resolve\Support\Fusion\Scripts\Edit\Altn_MediaDownloader.py"
+Type: filesandordirs; Name: "{userappdata}\Blackmagic Design\DaVinci Resolve\Support\Fusion\Templates\Edit\Effects\altn"
