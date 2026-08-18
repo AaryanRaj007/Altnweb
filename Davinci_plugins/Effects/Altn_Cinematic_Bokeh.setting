@@ -1,0 +1,199 @@
+{
+	Tools = ordered() {
+		AltnCinematicBokeh = GroupOperator {
+			CtrlWZoom = false,
+			NameSet = true,
+			CustomData = {
+				Path = {
+					Map = {
+						["Setting:"] = "Effects/altn/"
+					}
+				},
+				HelpPage = "https://altn.tv/plugins",
+			},
+
+			-- ─── Inspector Controls ───────────────────────────────────────
+			Inputs = ordered() {
+				Input = InstanceInput {
+					SourceOp = "InputPipe",
+					Source = "Input",
+				},
+
+				-- Blur
+				BokehAmount = InstanceInput {
+					SourceOp = "BokehBlur",
+					Source = "XBlurSize",
+					Name = "Bokeh Amount",
+					MinScale = 0,
+					MaxScale = 100,
+					Default = 12,
+				},
+
+				-- Optical Highlights
+				OpticalHighlights = InstanceInput {
+					SourceOp = "HighlightBoost",
+					Source = "Gain",
+					Name = "Optical Highlights",
+					MinScale = 0.8,
+					MaxScale = 2.0,
+					Default = 1.0,
+				},
+
+				-- Subject Mask Position
+				SubjectCenter = InstanceInput {
+					SourceOp = "SubjectMask",
+					Source = "Center",
+					Name = "Subject Position",
+				},
+
+				-- Subject Mask Shape
+				SubjectWidth = InstanceInput {
+					SourceOp = "SubjectMask",
+					Source = "Width",
+					Name = "Subject Width",
+					Default = 0.35,
+				},
+				SubjectHeight = InstanceInput {
+					SourceOp = "SubjectMask",
+					Source = "Height",
+					Name = "Subject Height",
+					Default = 0.6,
+				},
+				SubjectAngle = InstanceInput {
+					SourceOp = "SubjectMask",
+					Source = "Angle",
+					Name = "Subject Rotation",
+					Default = 0,
+				},
+
+				-- Edge Blend
+				EdgeFeather = InstanceInput {
+					SourceOp = "SubjectMask",
+					Source = "SoftEdge",
+					Name = "Edge Feather",
+					Default = 0.12,
+				},
+
+				-- Overall Effect Strength
+				EffectMix = InstanceInput {
+					SourceOp = "OutputMerge",
+					Source = "Blend",
+					Name = "Effect Mix",
+					Default = 1.0,
+				},
+			},
+
+			-- ─── Output ───────────────────────────────────────────────────
+			Outputs = ordered() {
+				Output = InstanceOutput {
+					SourceOp = "OutputMerge",
+					Source = "Output",
+				},
+			},
+
+			-- ─── Internal Layout ──────────────────────────────────────────
+			ViewInfo = GroupInfo {
+				Pos = { 0, 0 },
+				Flags = {
+					AllowPan = false,
+					AutoSnap = true,
+					GridSnap = true,
+				},
+				Size = { 600, 250 },
+				Direction = "Horizontal",
+			},
+
+			-- ─── Node Tree ────────────────────────────────────────────────
+			Tools = ordered() {
+
+				-- Input Router: receives the clip from the timeline
+				InputPipe = PipeRouter {
+					CtrlWZoom = false,
+					ViewInfo = PipeRouterInfo {
+						Pos = { 0, 60 },
+					},
+				},
+
+				-- Gaussian Blur: cinematic background defocus
+				BokehBlur = Blur {
+					CtrlWZoom = false,
+					Inputs = {
+						Filter = Input { Value = FuID { "Gaussian" } },
+						XBlurSize = Input { Value = 12 },
+						LockXY = Input { Value = 1 },
+						Input = Input {
+							SourceOp = "InputPipe",
+							Source = "Output",
+						},
+					},
+					ViewInfo = OperatorInfo {
+						Pos = { 165, 120 },
+					},
+				},
+
+				-- Subtle highlight bloom on the blurred path
+				-- simulates bright bokeh orbs from real lenses
+				HighlightBoost = BrightnessContrast {
+					CtrlWZoom = false,
+					Inputs = {
+						Gain = Input { Value = 1.0 },
+						Gamma = Input { Value = 1.05 },
+						Input = Input {
+							SourceOp = "BokehBlur",
+							Source = "Output",
+						},
+					},
+					ViewInfo = OperatorInfo {
+						Pos = { 330, 120 },
+					},
+				},
+
+				-- Subject isolation mask (ellipse)
+				-- User repositions / resizes in the viewer
+				SubjectMask = EllipseMask {
+					CtrlWZoom = false,
+					Inputs = {
+						SoftEdge = Input { Value = 0.12 },
+						BorderWidth = Input { Value = 0 },
+						MaskWidth = Input { Value = 1920 },
+						MaskHeight = Input { Value = 1080 },
+						PixelAspect = Input { Value = { 1, 1 } },
+						ClippingMode = Input { Value = FuID { "None" } },
+						Center = Input { Value = { 0.5, 0.5 } },
+						Width = Input { Value = 0.35 },
+						Height = Input { Value = 0.6 },
+					},
+					ViewInfo = OperatorInfo {
+						Pos = { 330, 0 },
+					},
+				},
+
+				-- Final composite:
+				-- FG = original sharp clip (subject stays razor-sharp)
+				-- BG = blurred + highlight-boosted version
+				-- Mask = where mask=1 (subject), show sharp FG
+				OutputMerge = Merge {
+					CtrlWZoom = false,
+					Inputs = {
+						Foreground = Input {
+							SourceOp = "InputPipe",
+							Source = "Output",
+						},
+						Background = Input {
+							SourceOp = "HighlightBoost",
+							Source = "Output",
+						},
+						EffectMask = Input {
+							SourceOp = "SubjectMask",
+							Source = "Mask",
+						},
+						Blend = Input { Value = 1.0 },
+					},
+					ViewInfo = OperatorInfo {
+						Pos = { 495, 60 },
+					},
+				},
+			},
+		},
+	},
+}
