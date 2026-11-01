@@ -6,7 +6,7 @@ A colour grading suite for trekking and drone footage: **35 self-authored LUTs**
 
 | Part | Folder | Stack |
 |---|---|---|
-| LUT pack: 33 creative and 2 utility LUTs, 65-point grid | `luts/`, `utility/` | `.cube` files generated with Python |
+| LUT pack: 33 creative and 2 utility LUTs, 65-point grid | `luts/`, `site/public/luts/utility/` | `.cube` files generated with Python |
 | Website (built for `altn.studio`) | `site/` | Astro 5, React islands, Tailwind CSS v4 |
 | Experimental site variant | `site_pro/` | Same stack, plus Motion animations |
 | YouTube media downloader for DaVinci Resolve | `Davinci_plugins/` | Python, PySide6, yt-dlp, ffmpeg |
